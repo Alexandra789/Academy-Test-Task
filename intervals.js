@@ -18,6 +18,13 @@ const NOTES_SHARP = [
     'B',
 ]
 
+const SPECIAL_NOTES = {
+    'E#': 'F',
+    'B#': 'C',
+    'Fb': 'E',
+    'Cb': 'B'
+}
+
 const NOTES_BASE = ['C', 'D', 'E', 'F', 'G', 'A', 'B'];
 
 const INTERVALS = {
@@ -78,13 +85,6 @@ const INTERVALS = {
 }
 
 function convertToSharp(note) {
-    const SPECIAL_NOTES = {
-        'E#': 'F',
-        'B#': 'C',
-        'Fb': 'E',
-        'Cb': 'B'
-    }
-
     if (note in SPECIAL_NOTES) {
         return SPECIAL_NOTES[note];
     }
@@ -101,7 +101,7 @@ function convertToSharp(note) {
     return NOTES[newIndex];
 }
 
-function findByDegree(noteWithSemitone, noteWithDegree) {
+function findSecondNote(noteWithSemitone, noteWithDegree) {
     let indexNoteWithDegree = NOTES_SHARP.indexOf(noteWithDegree);
     let indexNoteWithSemitone = NOTES_SHARP.indexOf(noteWithSemitone);
     let diff = indexNoteWithDegree - indexNoteWithSemitone;
@@ -123,7 +123,7 @@ function addInterval(array, noteIndex, interval) {
     if (newIndex > array.length) {
         newIndex -= array.length;
     }
-    if (newIndex < 0) {
+    else if (newIndex < 0) {
         newIndex += array.length;
     }
     return newIndex;
@@ -144,7 +144,6 @@ function intervalConstruction(arr) {
     let semitone = INTERVALS[intervalName].semitone;
     let degrees = INTERVALS[intervalName].degrees;
     let noteIndex = NOTES_SHARP.indexOf(noteNameSharp);
-    let degreeResult;
 
     if (direction === 'asc') {
         let noteWithSemitone = NOTES_SHARP[addInterval(NOTES_SHARP, noteIndex, semitone)];
@@ -153,7 +152,8 @@ function intervalConstruction(arr) {
                 NOTES_BASE,
                 NOTES_BASE.indexOf(noteName.charAt(0)),
                 degrees) - 1];
-        degreeResult = findByDegree(noteWithSemitone, noteWithDegree);
+
+        return findSecondNote(noteWithSemitone, noteWithDegree);
     }
     else {
         let noteWithSemitone = NOTES_SHARP[addInterval(NOTES_SHARP, noteIndex, -semitone)];
@@ -163,10 +163,8 @@ function intervalConstruction(arr) {
                 NOTES_BASE.indexOf(noteName.charAt(0)),
                 -degrees) + 1];
 
-        degreeResult = findByDegree(noteWithSemitone, noteWithDegree);
-
+        return findSecondNote(noteWithSemitone, noteWithDegree);
     }
-    return degreeResult;
 }
 
 function intervalIdentification(arr) {
@@ -175,8 +173,7 @@ function intervalIdentification(arr) {
     let secondNote = arr[1];
     let direction = arr.length === 3 ? arr[2] : 'asc';
     let interval;
-    validateArray(arr);
-    
+
     for (const INTERVAL in INTERVALS) {
         let noteResult = intervalConstruction([
             INTERVAL,
@@ -187,6 +184,6 @@ function intervalIdentification(arr) {
             interval = INTERVAL;
         }
     }
-
     return interval;
 }
+
